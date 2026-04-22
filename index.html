@@ -26,6 +26,7 @@
   --success: #4ade80;
   --warning: #fbbf24;
   --danger: #f87171;
+  --pr: #c084fc;
   --radius: 14px;
   --radius-sm: 10px;
   --shadow: 0 6px 20px rgba(0,0,0,.35);
@@ -50,7 +51,7 @@ body {
 #app {
   max-width: 640px;
   margin: 0 auto;
-  padding: 16px 14px 120px;
+  padding: 16px 14px 140px;
 }
 button {
   font: inherit;
@@ -69,7 +70,8 @@ input, select, textarea {
   padding: 10px 12px;
   outline: none;
 }
-input:focus { border-color: var(--accent); }
+input:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 64px; width: 100%; }
 
 /* ========== Top bar ========== */
 .topbar {
@@ -77,6 +79,7 @@ input:focus { border-color: var(--accent); }
   align-items: center;
   justify-content: space-between;
   padding: 4px 4px 14px;
+  gap: 8px;
 }
 .topbar h1 {
   font-size: 20px;
@@ -103,6 +106,7 @@ input:focus { border-color: var(--accent); }
   border: 1px solid var(--border);
   font-weight: 500;
   transition: transform .05s, background .15s;
+  text-decoration: none;
 }
 .btn:active { transform: scale(.98); }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -111,6 +115,7 @@ input:focus { border-color: var(--accent); }
 .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
 .btn-block { width: 100%; }
 .btn-lg { padding: 14px 22px; font-size: 16px; min-height: 56px; }
+.btn-sm { padding: 6px 12px; font-size: 13px; min-height: 32px; }
 
 /* ========== Home ========== */
 .day-card {
@@ -204,6 +209,19 @@ input:focus { border-color: var(--accent); }
   border-color: rgba(74,222,128,.35);
   background: linear-gradient(180deg, var(--card), rgba(74,222,128,.04));
 }
+.exercise-card.collapsed { padding: 12px 14px; }
+.exercise-card.collapsed .collapsed-body { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.exercise-card.collapsed .collapsed-summary {
+  color: var(--text-dim); font-size: 12.5px;
+  display: flex; align-items: center; gap: 8px;
+}
+.collapsed-expand {
+  font-size: 12px; color: var(--accent);
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 .ex-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .ex-name-btn {
   text-align: left;
@@ -268,7 +286,19 @@ input:focus { border-color: var(--accent); }
 .set-label {
   font-size: 13px; color: var(--text-dim);
   font-weight: 500;
+  display: flex; flex-direction: column; gap: 2px;
 }
+.set-label .copy-btn {
+  font-size: 10.5px;
+  color: var(--accent);
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  margin-top: 2px;
+  align-self: flex-start;
+}
+.set-label .copy-btn:hover { border-color: var(--accent); }
 .pill-group {
   display: flex; gap: 4px; flex-wrap: wrap;
 }
@@ -293,11 +323,6 @@ input:focus { border-color: var(--accent); }
 .pill.on.easy { background: var(--success); border-color: var(--success); color: #0a2617; }
 .pill.on.mod { background: var(--warning); border-color: var(--warning); color: #3a2700; }
 .pill.on.hard { background: var(--danger); border-color: var(--danger); color: #350b0b; }
-.pill-group .micro {
-  font-size: 10.5px;
-  color: var(--text-faint);
-  display: inline-flex; align-items: center; padding: 0 4px;
-}
 .set-col-label {
   font-size: 10.5px;
   color: var(--text-faint);
@@ -309,6 +334,104 @@ input:focus { border-color: var(--accent); }
   grid-template-columns: 56px 1fr 1fr;
   gap: 8px;
   padding-bottom: 4px;
+}
+
+/* Exercise card extras */
+.note-bar {
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.note-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  padding: 4px 0;
+}
+.note-toggle:hover { color: var(--text); }
+.note-prev {
+  color: var(--text-faint);
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--bg-raised);
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+}
+.warmup-banner {
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  background: rgba(251, 191, 36, .08);
+  border: 1px solid rgba(251, 191, 36, .3);
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: #fde8a7;
+  display: flex; align-items: center; gap: 10px;
+  line-height: 1.4;
+}
+.warmup-banner .dismiss {
+  color: var(--warning);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-left: auto;
+}
+
+/* ========== Rest timer bar ========== */
+.rest-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, rgba(26, 32, 56, .97), rgba(22, 28, 44, .97));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 12px 14px calc(12px + env(safe-area-inset-top));
+  padding-top: calc(12px + env(safe-area-inset-top));
+  z-index: 60;
+  display: none;
+}
+.rest-bar.show { display: block; animation: slidedown .2s ease-out; }
+@keyframes slidedown { from { transform: translateY(-100%) } to { transform: translateY(0) } }
+.rest-bar.flash { animation: restdone .4s ease-out 3; }
+@keyframes restdone {
+  0%, 100% { background: linear-gradient(180deg, rgba(26, 32, 56, .97), rgba(22, 28, 44, .97)); }
+  50% { background: linear-gradient(180deg, rgba(74, 222, 128, .5), rgba(74, 222, 128, .3)); }
+}
+.rest-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+}
+.rest-time {
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  min-width: 76px;
+}
+.rest-label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.rest-btns { display: flex; gap: 6px; }
+.rest-btn {
+  padding: 6px 10px;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+.rest-btn:hover { border-color: var(--accent); }
+.rest-bar.done .rest-time { color: var(--success); }
+.rest-bar.done .rest-label { color: var(--success); }
+body.rest-active #app {
+  padding-top: 90px;
+  transition: padding-top .2s;
 }
 
 /* ========== Sticky action bar ========== */
@@ -343,12 +466,13 @@ input:focus { border-color: var(--accent); }
   border-top-right-radius: 20px;
   width: 100%;
   max-width: 640px;
-  max-height: 85vh;
+  max-height: 90vh;
   overflow-y: auto;
   padding: 20px 18px calc(28px + env(safe-area-inset-bottom));
   border: 1px solid var(--border);
   border-bottom: none;
   animation: slideup .2s ease-out;
+  position: relative;
 }
 @keyframes slideup { from { transform: translateY(100%) } to { transform: translateY(0) } }
 .modal h3 { margin: 0 0 10px; font-size: 18px; }
@@ -377,6 +501,24 @@ input:focus { border-color: var(--accent); }
   margin: -8px auto 14px;
 }
 
+/* Sparkline */
+.spark-wrap {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0 14px;
+}
+.spark-wrap .spark-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.spark-wrap .spark-head strong { color: var(--text); font-size: 13px; font-weight: 600; }
+.spark-wrap svg { display: block; width: 100%; height: auto; }
+.spark-empty { color: var(--text-faint); font-size: 13px; text-align: center; padding: 12px; }
+
 /* ========== Completion preview ========== */
 .preview-card {
   background: var(--card);
@@ -385,7 +527,17 @@ input:focus { border-color: var(--accent); }
   padding: 14px;
   margin-bottom: 10px;
 }
-.preview-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.preview-card.pr { border-color: rgba(192, 132, 252, .5); background: linear-gradient(180deg, var(--card), rgba(192, 132, 252, .06)); }
+.preview-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.pr-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--pr);
+  background: rgba(192, 132, 252, .1);
+  border: 1px solid rgba(192, 132, 252, .4);
+  padding: 2px 8px; border-radius: 999px;
+  font-weight: 500;
+  letter-spacing: .4px;
+}
 .preview-change {
   display: flex; align-items: center; gap: 8px;
   font-size: 14px; color: var(--text-dim);
@@ -396,6 +548,7 @@ input:focus { border-color: var(--accent); }
 .change-same { color: var(--text-dim); }
 .change-down { color: var(--danger); }
 .preview-reason { color: var(--text-dim); font-size: 12.5px; margin-top: 6px; }
+.preview-note { color: var(--text-faint); font-size: 12px; font-style: italic; margin-top: 4px; }
 
 /* ========== History ========== */
 .hist-item {
@@ -404,22 +557,62 @@ input:focus { border-color: var(--accent); }
   border-radius: var(--radius);
   padding: 14px;
   margin-bottom: 10px;
+  text-align: left;
+  width: 100%;
+  display: block;
+  color: var(--text);
 }
+.hist-item:hover { border-color: var(--border-strong); }
 .hist-head { display: flex; justify-content: space-between; font-size: 15px; }
 .hist-date { color: var(--text-dim); font-size: 13px; }
 .hist-ex { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
 .hist-ex strong { color: var(--text); font-weight: 500; }
+.hist-meta { color: var(--text-faint); font-size: 12px; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+.hist-meta span::before { content: "·"; margin-right: 10px; color: var(--text-faint); }
+.hist-meta span:first-child::before { display: none; margin: 0; }
+
+.hist-note {
+  color: var(--text-faint);
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 4px;
+  padding-left: 8px;
+  border-left: 2px solid var(--border);
+}
 
 /* ========== Settings ========== */
 .setting-row {
   display: flex; justify-content: space-between; align-items: center;
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
+  gap: 10px;
 }
 .setting-row:last-child { border-bottom: none; }
 .setting-row .label { font-size: 15px; }
 .setting-row .desc { color: var(--text-dim); font-size: 12.5px; margin-top: 3px; }
 
+.switch {
+  position: relative;
+  width: 44px; height: 26px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: background .15s, border-color .15s;
+  flex-shrink: 0;
+}
+.switch::before {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: left .15s, background .15s;
+}
+.switch.on { background: var(--accent); border-color: var(--accent); }
+.switch.on::before { left: 20px; background: #fff; }
+
+/* ========== Toast ========== */
 .toast {
   position: fixed;
   left: 50%;
@@ -433,10 +626,20 @@ input:focus { border-color: var(--accent); }
   z-index: 200;
   animation: toastin .2s ease-out;
   box-shadow: var(--shadow);
-  max-width: 90%;
-  text-align: center;
+  max-width: 92%;
+  display: flex; align-items: center; gap: 12px;
 }
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 10px) } to { opacity: 1; transform: translate(-50%, 0) } }
+.toast .undo-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.toast .undo-btn:hover { background: rgba(90, 155, 255, .1); }
 
 .hint {
   color: var(--text-dim);
@@ -482,9 +685,18 @@ hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
   padding: 40px 20px;
 }
 .empty .big { font-size: 40px; margin-bottom: 10px; opacity: .6; }
+
+.number-input {
+  width: 60px;
+  text-align: center;
+  padding: 6px 8px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
 </style>
 </head>
 <body>
+<div id="rest-bar" class="rest-bar"></div>
 <div id="app"></div>
 <div id="modal-root"></div>
 <div id="toast-root"></div>
@@ -492,12 +704,12 @@ hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 <script>
 //============================================================
 // LIFT LOG — 3-Day Full-Body Dumbbell Tracker
-// Built for Evan. Progressive overload by RPE.
+// v2: rest timer, wake lock, haptics, charts, collapse, PR,
+//     undo, notes, duration, warmup reminders
 //============================================================
 
 const DUMBBELLS = [10, 15, 20, 25, 30, 35, 40, 45, 50];
 
-// Master exercise library — shared across days so progression carries over
 const EXERCISES = {
   "db-squat": { name: "Dumbbell Squat", slug: "dumbbell-squat", start: 15,
     cue: "DBs at sides or goblet-style. Sit back, knees track over toes, aim for parallel or just below. Chest up, core braced." },
@@ -573,13 +785,16 @@ const PROGRAM = {
   ]
 };
 
+// An exercise is "compound" if it's the 3x10 ones
+function isCompound(exDef) { return exDef.sets >= 3 && exDef.reps >= 10; }
+
 //============================================================
 // State + Storage
 //============================================================
 
 const STORAGE_KEY = "liftlog.v1";
 const PANTRY_BASKET = "workout-data";
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 function defaultState() {
   const weights = {};
@@ -587,12 +802,19 @@ function defaultState() {
   return {
     version: SCHEMA_VERSION,
     updatedAt: new Date().toISOString(),
-    weights,                // { exerciseId: currentSuggestedWeight }
-    sessions: [],           // completed sessions
-    draft: null,            // in-progress session
+    weights,
+    sessions: [],
+    draft: null,
     settings: {
       pantryId: "",
-      orderMode: "weight",  // "weight" | "program"
+      orderMode: "weight",
+      restEnabled: true,
+      restCompoundSec: 90,
+      restIsolationSec: 60,
+      hapticsEnabled: true,
+      warmupReminders: true,
+      autoCollapse: true,
+      soundEnabled: true,
     }
   };
 }
@@ -604,7 +826,6 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    // Shallow merge with defaults in case of schema additions
     const d = defaultState();
     return { ...d, ...parsed,
       weights: { ...d.weights, ...(parsed.weights || {}) },
@@ -625,7 +846,7 @@ function saveState(skipSync) {
 
 const pantryUrl = (id) => `https://getpantry.cloud/apiv1/pantry/${encodeURIComponent(id)}/basket/${PANTRY_BASKET}`;
 
-let syncStatus = "idle"; // idle | syncing | ok | error
+let syncStatus = "idle";
 let syncMessage = "";
 let syncTimer = null;
 
@@ -666,7 +887,6 @@ async function pullFromPantry(opts = {}) {
   try {
     const resp = await fetch(pantryUrl(id));
     if (resp.status === 400 || resp.status === 404) {
-      // Empty basket — push current state
       await pushToPantry();
       return;
     }
@@ -682,7 +902,6 @@ async function pullFromPantry(opts = {}) {
       setSync("ok", "Pulled latest from cloud");
       if (opts.rerender) render();
     } else {
-      // Local is newer or same — push up
       await pushToPantry();
     }
   } catch (e) {
@@ -691,38 +910,245 @@ async function pullFromPantry(opts = {}) {
 }
 
 //============================================================
-// Progression logic
+// Haptics
+//============================================================
+
+function haptic(duration = 10) {
+  if (!state.settings.hapticsEnabled) return;
+  try {
+    if (navigator.vibrate) navigator.vibrate(duration);
+  } catch (e) {}
+}
+function hapticPattern(pattern) {
+  if (!state.settings.hapticsEnabled) return;
+  try {
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  } catch (e) {}
+}
+
+//============================================================
+// Sound — short beep via Web Audio, requires user gesture to init
+//============================================================
+
+let audioCtx = null;
+function ensureAudio() {
+  if (audioCtx) return audioCtx;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) audioCtx = new Ctx();
+  } catch (e) {}
+  return audioCtx;
+}
+function beep(freq = 880, durMs = 160) {
+  if (!state.settings.soundEnabled) return;
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = "sine";
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + durMs/1000);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + durMs/1000 + 0.02);
+  } catch (e) {}
+}
+
+//============================================================
+// Wake lock
+//============================================================
+
+let wakeLockSentinel = null;
+async function acquireWakeLock() {
+  if (!("wakeLock" in navigator)) return;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request("screen");
+    wakeLockSentinel.addEventListener("release", () => { wakeLockSentinel = null; });
+  } catch (e) { /* user dismissed, battery saver, etc. */ }
+}
+function releaseWakeLock() {
+  if (wakeLockSentinel) {
+    try { wakeLockSentinel.release(); } catch (e) {}
+    wakeLockSentinel = null;
+  }
+}
+// Re-acquire if visibility returns during a session
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && view.name === "session" && !wakeLockSentinel) {
+    acquireWakeLock();
+  }
+});
+
+//============================================================
+// Rest timer
+//============================================================
+
+let restState = { running: false, endsAt: 0, totalSec: 0, intervalId: null, label: "Rest" };
+
+function startRest(seconds, label = "Rest") {
+  if (!state.settings.restEnabled) return;
+  ensureAudio(); // warm up audio context on user gesture
+  restState.running = true;
+  restState.endsAt = Date.now() + seconds * 1000;
+  restState.totalSec = seconds;
+  restState.label = label;
+  clearInterval(restState.intervalId);
+  restState.intervalId = setInterval(tickRest, 250);
+  renderRestBar();
+  document.body.classList.add("rest-active");
+}
+function tickRest() {
+  if (!restState.running) return;
+  const remaining = Math.max(0, restState.endsAt - Date.now());
+  renderRestBar();
+  if (remaining <= 0) {
+    clearInterval(restState.intervalId);
+    restState.intervalId = null;
+    restState.running = false;
+    hapticPattern([120, 80, 120, 80, 200]);
+    beep(880, 120);
+    setTimeout(() => beep(1175, 180), 180);
+    const bar = document.getElementById("rest-bar");
+    if (bar) {
+      bar.classList.add("done", "flash");
+      setTimeout(() => { if (bar) { bar.classList.remove("done", "flash"); } dismissRest(); }, 3500);
+    }
+  }
+}
+function adjustRest(deltaSec) {
+  if (!restState.running) return;
+  restState.endsAt += deltaSec * 1000;
+  restState.totalSec += deltaSec;
+  haptic(8);
+  renderRestBar();
+}
+function dismissRest() {
+  restState.running = false;
+  clearInterval(restState.intervalId);
+  restState.intervalId = null;
+  document.body.classList.remove("rest-active");
+  const bar = document.getElementById("rest-bar");
+  if (bar) bar.classList.remove("show", "done", "flash");
+}
+function renderRestBar() {
+  const bar = document.getElementById("rest-bar");
+  if (!bar) return;
+  if (!restState.running && !bar.classList.contains("done")) { bar.classList.remove("show"); return; }
+  bar.classList.add("show");
+  const remaining = Math.max(0, Math.ceil((restState.endsAt - Date.now()) / 1000));
+  const mm = Math.floor(remaining / 60);
+  const ss = remaining % 60;
+  const timeStr = mm > 0 ? `${mm}:${String(ss).padStart(2,"0")}` : `${ss}s`;
+  bar.innerHTML = "";
+  const inner = document.createElement("div");
+  inner.className = "rest-inner";
+  const timeEl = document.createElement("div");
+  timeEl.className = "rest-time";
+  timeEl.textContent = remaining <= 0 ? "Done!" : timeStr;
+  const label = document.createElement("div");
+  label.className = "rest-label";
+  label.textContent = remaining <= 0 ? "Next set" : restState.label;
+  const btns = document.createElement("div");
+  btns.className = "rest-btns";
+  const plus = document.createElement("button");
+  plus.className = "rest-btn";
+  plus.textContent = "+30s";
+  plus.onclick = () => adjustRest(30);
+  const skip = document.createElement("button");
+  skip.className = "rest-btn";
+  skip.textContent = "Skip";
+  skip.onclick = () => { haptic(8); dismissRest(); };
+  btns.appendChild(plus);
+  btns.appendChild(skip);
+  inner.appendChild(timeEl);
+  inner.appendChild(label);
+  inner.appendChild(btns);
+  bar.appendChild(inner);
+}
+
+//============================================================
+// Undo stack
+//============================================================
+
+let pendingUndo = null; // { undoFn, description }
+let undoToastTimer = null;
+
+function captureUndo(description, undoFn) {
+  pendingUndo = { undoFn, description };
+  showUndoToast(description);
+}
+function showUndoToast(msg) {
+  const root = document.getElementById("toast-root");
+  if (!root) return;
+  root.innerHTML = "";
+  const t = document.createElement("div");
+  t.className = "toast";
+  const text = document.createElement("span");
+  text.textContent = msg;
+  const btn = document.createElement("button");
+  btn.className = "undo-btn";
+  btn.textContent = "Undo";
+  btn.onclick = () => {
+    if (pendingUndo) { haptic(12); pendingUndo.undoFn(); pendingUndo = null; }
+    root.innerHTML = "";
+  };
+  t.appendChild(text);
+  t.appendChild(btn);
+  root.appendChild(t);
+  clearTimeout(undoToastTimer);
+  undoToastTimer = setTimeout(() => {
+    if (root.firstChild === t) root.innerHTML = "";
+    pendingUndo = null;
+  }, 4000);
+}
+
+//============================================================
+// PR tracking
+//============================================================
+
+function computeMaxWeights() {
+  // Max weight ever lifted where at least one set was completed with reps >= 1
+  const maxes = {};
+  for (const s of state.sessions) {
+    for (const exId in s.entries) {
+      const e = s.entries[exId];
+      if (!e.sets || e.sets.length === 0) continue;
+      const anySetComplete = e.sets.some(set => typeof set.reps === "number" && set.reps >= 1);
+      if (!anySetComplete) continue;
+      if (!maxes[exId] || e.actualWeight > maxes[exId]) maxes[exId] = e.actualWeight;
+    }
+  }
+  return maxes;
+}
+
+//============================================================
+// Progression logic (unchanged — passed scenario tests)
 //============================================================
 
 function suggestNextWeight(exerciseId, entry, targetReps) {
-  // entry: { actualWeight, sets: [{reps, rpe}] }
   if (!entry || !entry.sets || entry.sets.length === 0) {
     return { weight: state.weights[exerciseId] || EXERCISES[exerciseId].start, reason: "No data yet — using starting weight." };
   }
   const rpes = entry.sets.map(s => s.rpe).filter(r => typeof r === "number");
-  if (rpes.length === 0) {
-    return { weight: entry.actualWeight, reason: "No RPE data — holding." };
-  }
+  if (rpes.length === 0) return { weight: entry.actualWeight, reason: "No RPE data — holding." };
   const avgRpe = rpes.reduce((a,b)=>a+b,0) / rpes.length;
   const allRepsHit = entry.sets.every(s => typeof s.reps === "number" && s.reps >= targetReps);
   const current = entry.actualWeight;
   const idx = DUMBBELLS.indexOf(current);
   const maxIdx = DUMBBELLS.length - 1;
-
   if (idx === -1) {
-    // Weight not in the available set — snap to nearest
     const nearest = DUMBBELLS.reduce((best,w) => Math.abs(w-current) < Math.abs(best-current) ? w : best, DUMBBELLS[0]);
     return { weight: nearest, reason: `Snapped to nearest available weight (${nearest} lb).` };
   }
-
   if (allRepsHit && avgRpe <= 7.4) {
     const next = DUMBBELLS[Math.min(idx + 1, maxIdx)];
     if (next === current) return { weight: current, reason: `RPE ${avgRpe.toFixed(1)} — but already at max dumbbell.` };
     return { weight: next, reason: `RPE ${avgRpe.toFixed(1)}, all reps hit — increase ${current}→${next} lb.` };
   }
-  if (allRepsHit && avgRpe <= 8.4) {
-    return { weight: current, reason: `RPE ${avgRpe.toFixed(1)} — hold weight, try to add a rep next time.` };
-  }
+  if (allRepsHit && avgRpe <= 8.4) return { weight: current, reason: `RPE ${avgRpe.toFixed(1)} — hold weight, try to add a rep next time.` };
   if (avgRpe >= 9.5) {
     const next = DUMBBELLS[Math.max(idx - 1, 0)];
     if (next === current) return { weight: current, reason: `RPE ${avgRpe.toFixed(1)} — already at min weight, focus on form.` };
@@ -735,17 +1161,19 @@ function suggestNextWeight(exerciseId, entry, targetReps) {
   return { weight: current, reason: `RPE ${avgRpe.toFixed(1)} — hold.` };
 }
 
-// After completing a session, update weights for every exercise in it
 function applyProgression(session) {
   const dayDef = PROGRAM.days[session.dayIndex];
   const updates = [];
+  const prevMaxes = computeMaxWeights();
   for (const ex of dayDef.exercises) {
     const entry = session.entries[ex.id];
     if (!entry) continue;
     const before = state.weights[ex.id];
     const s = suggestNextWeight(ex.id, entry, ex.reps);
     state.weights[ex.id] = s.weight;
-    updates.push({ id: ex.id, name: EXERCISES[ex.id].name, before, after: s.weight, reason: s.reason });
+    const prevMax = prevMaxes[ex.id] || 0;
+    const isPR = s.weight > prevMax && s.weight > before;
+    updates.push({ id: ex.id, name: EXERCISES[ex.id].name, before, after: s.weight, reason: s.reason, isPR });
   }
   return updates;
 }
@@ -765,11 +1193,15 @@ function render() {
     case "session": renderSession(root); break;
     case "preview": renderPreview(root); break;
     case "history": renderHistory(root); break;
+    case "historyDetail": renderHistoryDetail(root); break;
     case "settings": renderSettings(root); break;
     case "onboarding": renderOnboarding(root); break;
     default: renderHome(root);
   }
   window.scrollTo({ top: 0, behavior: "instant" });
+  // Acquire/release wake lock based on view
+  if (view.name === "session") acquireWakeLock();
+  else releaseWakeLock();
 }
 
 function el(tag, props = {}, ...children) {
@@ -779,7 +1211,7 @@ function el(tag, props = {}, ...children) {
     else if (k === "html") e.innerHTML = props[k];
     else if (k.startsWith("on") && typeof props[k] === "function") e.addEventListener(k.slice(2).toLowerCase(), props[k]);
     else if (k === "style" && typeof props[k] === "object") Object.assign(e.style, props[k]);
-    else if (k in e) e[k] = props[k];
+    else if (k in e && k !== "type") e[k] = props[k];
     else e.setAttribute(k, props[k]);
   }
   for (const c of children.flat()) {
@@ -790,7 +1222,7 @@ function el(tag, props = {}, ...children) {
 }
 
 //============================================================
-// Views
+// Home
 //============================================================
 
 function renderHome(root) {
@@ -800,7 +1232,7 @@ function renderHome(root) {
       el("div", { class: "sub" }, "3-Day Full Body Dumbbell")
     ),
     el("div", {},
-      el("button", { class: "icon-btn", onclick: () => { view = { name: "settings" }; render(); }, title: "Settings", "aria-label": "Settings" },
+      el("button", { class: "icon-btn", onclick: () => { haptic(8); view = { name: "settings" }; render(); }, title: "Settings", "aria-label": "Settings" },
         el("span", { html: settingsIcon() })
       )
     )
@@ -811,14 +1243,10 @@ function renderHome(root) {
   renderSyncStatus(syncEl);
   root.appendChild(syncEl);
 
-  // Day cards
   for (let i = 0; i < PROGRAM.days.length; i++) {
     const day = PROGRAM.days[i];
     const last = lastSessionForDay(i);
-    const card = el("button", {
-      class: "day-card",
-      onclick: () => { startSession(i); }
-    },
+    const card = el("button", { class: "day-card", onclick: () => { haptic(10); startSession(i); } },
       el("div", { class: "meta" },
         el("div", { class: "title" }, day.name),
         el("div", { class: "detail" }, `${day.exercises.length} exercises · ${totalSetsForDay(day)} working sets`),
@@ -831,7 +1259,6 @@ function renderHome(root) {
     root.appendChild(card);
   }
 
-  // Resume banner if draft exists
   if (state.draft) {
     const d = state.draft;
     const dayName = PROGRAM.days[d.dayIndex].name;
@@ -840,9 +1267,9 @@ function renderHome(root) {
         el("div", { class: "preview-name" }, `Unfinished ${dayName} session`),
         el("div", { class: "preview-reason" }, `Started ${relTime(d.date)}`),
         el("div", { style: { marginTop: "10px", display: "flex", gap: "8px" } },
-          el("button", { class: "btn btn-primary", onclick: () => { view = { name: "session" }; render(); } }, "Resume"),
+          el("button", { class: "btn btn-primary", onclick: () => { haptic(8); view = { name: "session" }; render(); } }, "Resume"),
           el("button", { class: "btn btn-ghost", onclick: () => {
-            if (confirm("Discard unfinished session?")) { state.draft = null; saveState(); render(); }
+            if (confirm("Discard unfinished session?")) { haptic(12); state.draft = null; saveState(); render(); }
           }}, "Discard")
         )
       )
@@ -850,20 +1277,26 @@ function renderHome(root) {
   }
 
   const row = el("div", { class: "secondary-row" },
-    el("button", { class: "btn", onclick: () => { view = { name: "history" }; render(); } }, "History"),
-    el("button", { class: "btn", onclick: () => { view = { name: "settings" }; render(); } }, "Settings")
+    el("button", { class: "btn", onclick: () => { haptic(8); view = { name: "history" }; render(); } }, "History"),
+    el("button", { class: "btn", onclick: () => { haptic(8); view = { name: "settings" }; render(); } }, "Settings")
   );
   root.appendChild(row);
 
-  // Footer info
-  root.appendChild(el("div", { class: "hint", style: { marginTop: "24px", textAlign: "center" } },
-    "Tap any exercise name during a workout to see the form cue and a video demo."
+  // Streak/summary
+  if (state.sessions.length > 0) {
+    const last7 = state.sessions.filter(s => (Date.now() - new Date(s.date).getTime()) < 7*86400000);
+    const last30 = state.sessions.filter(s => (Date.now() - new Date(s.date).getTime()) < 30*86400000);
+    root.appendChild(el("div", { class: "hint", style: { marginTop: "20px", textAlign: "center" } },
+      `${state.sessions.length} sessions total · ${last7.length} this week · ${last30.length} in the last 30 days`
+    ));
+  }
+
+  root.appendChild(el("div", { class: "hint", style: { textAlign: "center" } },
+    "Tap any exercise name during a workout for the form cue and a video demo."
   ));
 }
 
-function totalSetsForDay(day) {
-  return day.exercises.reduce((a, ex) => a + ex.sets, 0);
-}
+function totalSetsForDay(day) { return day.exercises.reduce((a, ex) => a + ex.sets, 0); }
 
 function lastSessionForDay(dayIndex) {
   for (let i = state.sessions.length - 1; i >= 0; i--) {
@@ -871,7 +1304,15 @@ function lastSessionForDay(dayIndex) {
   }
   return null;
 }
-
+function lastSessionEntryForExercise(exId, beforeDate) {
+  // Finds most recent session (optionally strictly before a given date) with this exercise
+  for (let i = state.sessions.length - 1; i >= 0; i--) {
+    const s = state.sessions[i];
+    if (beforeDate && new Date(s.date) >= new Date(beforeDate)) continue;
+    if (s.entries[exId]) return { session: s, entry: s.entries[exId] };
+  }
+  return null;
+}
 function relTime(iso) {
   const then = new Date(iso).getTime();
   const diff = Date.now() - then;
@@ -888,7 +1329,6 @@ function renderSyncStatus(container) {
   let dotClass = "sync-dot";
   let text = "";
   if (!state.settings.pantryId) {
-    dotClass += "";
     text = "Local only — connect Pantry in Settings for cross-device sync";
   } else if (syncStatus === "syncing") {
     dotClass += " pending";
@@ -908,10 +1348,11 @@ function renderSyncStatus(container) {
 }
 
 //============================================================
-// Start a session
+// Session: start + render
 //============================================================
 
 function startSession(dayIndex) {
+  ensureAudio(); // warm up audio context
   if (state.draft && state.draft.dayIndex !== dayIndex) {
     if (!confirm(`You have an unfinished ${PROGRAM.days[state.draft.dayIndex].name} session. Starting ${PROGRAM.days[dayIndex].name} will discard it. Continue?`)) return;
   }
@@ -926,23 +1367,24 @@ function startSession(dayIndex) {
     entries[ex.id] = {
       suggestedWeight: state.weights[ex.id] ?? EXERCISES[ex.id].start,
       actualWeight: state.weights[ex.id] ?? EXERCISES[ex.id].start,
-      sets: []
+      sets: [],
+      note: "",
+      noteOpen: false,
+      manuallyExpanded: false,
     };
   }
   state.draft = {
     id: "s" + Date.now(),
     dayIndex,
     date: new Date().toISOString(),
-    entries
+    startedAt: new Date().toISOString(),
+    entries,
+    warmupDismissed: false,
   };
   saveState();
   view = { name: "session" };
   render();
 }
-
-//============================================================
-// Session view
-//============================================================
 
 function renderSession(root) {
   const draft = state.draft;
@@ -955,7 +1397,7 @@ function renderSession(root) {
     ),
     el("div", { style: { textAlign: "center", flex: "1" } },
       el("h1", {}, day.name),
-      el("div", { class: "sub" }, new Date(draft.date).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" }))
+      el("div", { class: "sub" }, elapsedSessionText(draft))
     ),
     el("button", { class: "icon-btn", onclick: toggleOrderMode, title: "Toggle order", "aria-label": "Toggle order" },
       el("span", { html: state.settings.orderMode === "weight" ? groupIcon() : listIcon() })
@@ -965,16 +1407,14 @@ function renderSession(root) {
 
   const toggle = el("div", { style: { display: "flex", justifyContent: "center", marginBottom: "12px" } },
     el("div", { class: "segmented" },
-      el("button", { class: state.settings.orderMode === "weight" ? "on" : "", onclick: () => { state.settings.orderMode = "weight"; saveState(true); render(); } }, "Grouped by weight"),
-      el("button", { class: state.settings.orderMode === "program" ? "on" : "", onclick: () => { state.settings.orderMode = "program"; saveState(true); render(); } }, "Program order")
+      el("button", { class: state.settings.orderMode === "weight" ? "on" : "", onclick: () => { haptic(6); state.settings.orderMode = "weight"; saveState(true); render(); } }, "Grouped by weight"),
+      el("button", { class: state.settings.orderMode === "program" ? "on" : "", onclick: () => { haptic(6); state.settings.orderMode = "program"; saveState(true); render(); } }, "Program order")
     )
   );
   root.appendChild(toggle);
 
-  // Build ordered exercise list
   let ordered;
   if (state.settings.orderMode === "weight") {
-    // Group by actualWeight ascending
     const groups = {};
     for (const ex of day.exercises) {
       const w = draft.entries[ex.id].actualWeight;
@@ -990,10 +1430,19 @@ function renderSession(root) {
     ordered = day.exercises.map(ex => ({ type: "ex", ex }));
   }
 
+  // Find first compound exercise (for warmup banner)
+  const firstCompoundId = day.exercises.find(ex => isCompound(ex))?.id;
+  let warmupRendered = false;
+
   for (const item of ordered) {
     if (item.type === "group") {
       root.appendChild(el("div", { class: "weight-group-label" }, `${item.weight} lb group`));
     } else {
+      // Warmup banner above the first compound in the session (regardless of ordering)
+      if (!warmupRendered && state.settings.warmupReminders && !draft.warmupDismissed && item.ex.id === firstCompoundId && isCompound(item.ex)) {
+        root.appendChild(renderWarmupBanner());
+        warmupRendered = true;
+      }
       root.appendChild(renderExerciseCard(item.ex, draft));
     }
   }
@@ -1014,15 +1463,50 @@ function renderSession(root) {
   root.appendChild(bar);
 }
 
+function elapsedSessionText(draft) {
+  const started = new Date(draft.startedAt || draft.date).getTime();
+  const mins = Math.floor((Date.now() - started) / 60000);
+  const dateStr = new Date(draft.date).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+  return `${dateStr} · ${mins}m in`;
+}
+
+function renderWarmupBanner() {
+  return el("div", { class: "warmup-banner" },
+    el("span", {}, "⚡"),
+    el("span", {}, "Before your first working set, consider 1–2 light warmup sets (e.g., 5–6 reps at 50–70% of today's weight)."),
+    el("button", { class: "dismiss", onclick: () => { haptic(8); state.draft.warmupDismissed = true; saveState(true); render(); }, "aria-label": "Dismiss" }, "✕")
+  );
+}
+
 function isExerciseComplete(exDef, entry) {
   if (!entry) return false;
-  return entry.sets.length >= exDef.sets && entry.sets.every(s => typeof s.reps === "number" && typeof s.rpe === "number");
+  return entry.sets.length >= exDef.sets && entry.sets.slice(0, exDef.sets).every(s => typeof s.reps === "number" && typeof s.rpe === "number");
 }
 
 function renderExerciseCard(exDef, draft) {
   const ex = EXERCISES[exDef.id];
   const entry = draft.entries[exDef.id];
   const complete = isExerciseComplete(exDef, entry);
+  const shouldCollapse = complete && state.settings.autoCollapse && !entry.manuallyExpanded;
+
+  if (shouldCollapse) {
+    const card = el("div", { class: "exercise-card done collapsed" });
+    card.appendChild(el("div", { class: "collapsed-body" },
+      el("div", {},
+        el("button", { class: "ex-name-btn", onclick: () => openExerciseModal(exDef.id) },
+          ex.name,
+          el("span", { class: "info-icon" }, "i")
+        ),
+        el("div", { class: "collapsed-summary" },
+          el("span", { class: "ex-check" }, "✓"),
+          el("span", {}, `${entry.actualWeight} lb · ${entry.sets.length} sets · ${entry.sets.reduce((a,s)=>a+s.reps,0)} reps`)
+        )
+      ),
+      el("button", { class: "collapsed-expand", onclick: () => { haptic(6); entry.manuallyExpanded = true; saveState(true); render(); } }, "Edit")
+    ));
+    return card;
+  }
+
   const card = el("div", { class: "exercise-card" + (complete ? " done" : "") });
 
   const head = el("div", { class: "ex-head" },
@@ -1036,6 +1520,12 @@ function renderExerciseCard(exDef, draft) {
     complete ? el("span", { class: "ex-check" }, "✓") : null
   );
   card.appendChild(head);
+
+  // Previous session note, if any
+  const prev = lastSessionEntryForExercise(exDef.id, draft.date);
+  if (prev && prev.entry.note) {
+    card.appendChild(el("div", { class: "note-prev" }, `Last time: "${prev.entry.note}"`));
+  }
 
   // Weight control
   const wIdx = DUMBBELLS.indexOf(entry.actualWeight);
@@ -1061,24 +1551,63 @@ function renderExerciseCard(exDef, draft) {
     )
   );
 
-  // Set rows
   for (let i = 0; i < exDef.sets; i++) {
     const setData = entry.sets[i] || {};
-    card.appendChild(renderSetRow(exDef, i, setData));
+    const prevSetData = i > 0 ? entry.sets[i-1] : null;
+    const prevSetComplete = prevSetData && typeof prevSetData.reps === "number" && typeof prevSetData.rpe === "number";
+    const thisSetBlank = !setData || (typeof setData.reps !== "number" && typeof setData.rpe !== "number");
+    card.appendChild(renderSetRow(exDef, i, setData, prevSetComplete && thisSetBlank ? prevSetData : null));
   }
+
+  // Note toggle/field
+  card.appendChild(renderNoteArea(exDef, entry));
+
   return card;
 }
 
-function renderSetRow(exDef, setIdx, setData) {
+function renderNoteArea(exDef, entry) {
+  const wrap = el("div", { class: "note-bar" });
+  if (entry.noteOpen) {
+    const ta = el("textarea", {
+      placeholder: "Quick note for next time (form feel, grip, etc.)",
+      value: entry.note || "",
+      oninput: (e) => { entry.note = e.target.value; },
+      onblur: () => { saveState(); }
+    });
+    const row = el("div", { style: { display: "flex", gap: "6px", marginTop: "6px", justifyContent: "space-between" } },
+      el("button", { class: "btn btn-sm btn-ghost", onclick: () => { haptic(6); entry.noteOpen = false; saveState(); render(); } }, "Done"),
+      entry.note ? el("button", { class: "btn btn-sm btn-danger", onclick: () => { haptic(8); entry.note = ""; entry.noteOpen = false; saveState(); render(); } }, "Clear") : null
+    );
+    wrap.appendChild(ta);
+    wrap.appendChild(row);
+  } else {
+    wrap.appendChild(
+      el("button", { class: "note-toggle", onclick: () => { haptic(6); entry.noteOpen = true; saveState(true); render(); } },
+        el("span", {}, entry.note ? "📝 " : "＋ "),
+        el("span", {}, entry.note ? `"${entry.note.length > 40 ? entry.note.slice(0,40)+"…" : entry.note}"` : "Add note")
+      )
+    );
+  }
+  return wrap;
+}
+
+function renderSetRow(exDef, setIdx, setData, copyFromPrev) {
   const targetReps = exDef.reps;
-  // Rep options: target-2, target-1, target, target+1, target+2
   const repOptions = [];
   for (let r = Math.max(0, targetReps - 2); r <= targetReps + 2; r++) repOptions.push(r);
-
   const rpeOptions = [6, 7, 8, 9, 10];
 
+  const leftCol = el("div", { class: "set-label" },
+    `Set ${setIdx + 1}`,
+    copyFromPrev ? el("button", {
+      class: "copy-btn",
+      onclick: () => copyPreviousSet(exDef.id, setIdx),
+      title: `Copy: ${copyFromPrev.reps} reps @ RPE ${copyFromPrev.rpe}`
+    }, "↻ Same") : null
+  );
+
   const row = el("div", { class: "set-row" },
-    el("div", { class: "set-label" }, `Set ${setIdx + 1}`),
+    leftCol,
     el("div", { class: "pill-group" },
       ...repOptions.map(r => el("button", {
         class: "pill" + (setData.reps === r ? " on" : ""),
@@ -1105,34 +1634,105 @@ function renderSetRow(exDef, setIdx, setData) {
 
 function setRep(exId, setIdx, reps) {
   const entry = state.draft.entries[exId];
+  const prev = { ...entry.sets[setIdx] };
   entry.sets[setIdx] = { ...entry.sets[setIdx], reps };
+  haptic(8);
   saveState();
+  const wasComplete = typeof prev.reps === "number" && typeof prev.rpe === "number";
+  const nowComplete = typeof entry.sets[setIdx].reps === "number" && typeof entry.sets[setIdx].rpe === "number";
+  if (nowComplete && !wasComplete) onSetCompleted(exId, setIdx);
+  captureUndo(`Set ${setIdx+1} reps = ${reps}`, () => {
+    if (Object.keys(prev).length === 0) entry.sets[setIdx] = {};
+    else entry.sets[setIdx] = prev;
+    saveState();
+    render();
+  });
   render();
 }
+
 function setRpe(exId, setIdx, rpe) {
   const entry = state.draft.entries[exId];
+  const prev = { ...entry.sets[setIdx] };
   entry.sets[setIdx] = { ...entry.sets[setIdx], rpe };
+  haptic(8);
   saveState();
+  const wasComplete = typeof prev.reps === "number" && typeof prev.rpe === "number";
+  const nowComplete = typeof entry.sets[setIdx].reps === "number" && typeof entry.sets[setIdx].rpe === "number";
+  if (nowComplete && !wasComplete) onSetCompleted(exId, setIdx);
+  captureUndo(`Set ${setIdx+1} RPE = ${rpe}`, () => {
+    if (Object.keys(prev).length === 0) entry.sets[setIdx] = {};
+    else entry.sets[setIdx] = prev;
+    saveState();
+    render();
+  });
   render();
 }
+
+function copyPreviousSet(exId, setIdx) {
+  const entry = state.draft.entries[exId];
+  const prevSet = entry.sets[setIdx - 1];
+  if (!prevSet || typeof prevSet.reps !== "number" || typeof prevSet.rpe !== "number") return;
+  const prev = { ...entry.sets[setIdx] };
+  entry.sets[setIdx] = { reps: prevSet.reps, rpe: prevSet.rpe };
+  haptic(12);
+  saveState();
+  const wasComplete = typeof prev.reps === "number" && typeof prev.rpe === "number";
+  if (!wasComplete) onSetCompleted(exId, setIdx);
+  captureUndo(`Copied set ${setIdx} → ${setIdx+1}`, () => {
+    if (Object.keys(prev).length === 0) entry.sets[setIdx] = {};
+    else entry.sets[setIdx] = prev;
+    saveState();
+    render();
+  });
+  render();
+}
+
+function onSetCompleted(exId, setIdx) {
+  // Start rest timer if not the last set of last exercise
+  const draft = state.draft;
+  const day = PROGRAM.days[draft.dayIndex];
+  const exDef = day.exercises.find(e => e.id === exId);
+  if (!exDef) return;
+  const isLastSetOfExercise = setIdx >= exDef.sets - 1;
+  // Check if this was the last exercise's last set
+  const allOtherComplete = day.exercises.every(e => {
+    if (e.id === exId) return setIdx >= exDef.sets - 1; // we're completing this one
+    return isExerciseComplete(e, draft.entries[e.id]);
+  });
+  if (isLastSetOfExercise && allOtherComplete) {
+    // Don't start a timer — session is done
+    return;
+  }
+  const secs = isCompound(exDef) ? state.settings.restCompoundSec : state.settings.restIsolationSec;
+  const label = isLastSetOfExercise ? "Rest before next exercise" : "Rest between sets";
+  startRest(secs, label);
+}
+
 function adjustWeight(exId, delta) {
   const entry = state.draft.entries[exId];
   const idx = DUMBBELLS.indexOf(entry.actualWeight);
   const next = DUMBBELLS[Math.max(0, Math.min(DUMBBELLS.length - 1, idx + delta))];
+  if (next === entry.actualWeight) return;
+  const prev = entry.actualWeight;
   entry.actualWeight = next;
+  haptic(6);
   saveState();
+  captureUndo(`Weight ${prev} → ${next} lb`, () => { entry.actualWeight = prev; saveState(); render(); });
   render();
 }
+
 function toggleOrderMode() {
+  haptic(8);
   state.settings.orderMode = state.settings.orderMode === "weight" ? "program" : "weight";
   saveState(true);
   render();
 }
 
 function confirmLeaveSession() {
-  // Any data logged?
   const hasData = Object.values(state.draft.entries).some(e => e.sets.some(s => typeof s.reps === "number" || typeof s.rpe === "number"));
   if (!hasData || confirm("Leave session? Your progress is saved — you can resume from the home screen.")) {
+    haptic(8);
+    dismissRest();
     view = { name: "home" };
     render();
   }
@@ -1141,7 +1741,6 @@ function confirmLeaveSession() {
 function finishSession() {
   const draft = state.draft;
   const day = PROGRAM.days[draft.dayIndex];
-  // Check any sets logged at all
   const anyLogged = day.exercises.some(ex => {
     const e = draft.entries[ex.id];
     return e.sets.some(s => typeof s.reps === "number" && typeof s.rpe === "number");
@@ -1149,17 +1748,27 @@ function finishSession() {
   if (!anyLogged) {
     if (!confirm("No sets have been logged. Finish anyway (no progression will be calculated)?")) return;
   }
-  // Trim set data — keep only sets that have both reps and rpe
+  haptic(20);
+  dismissRest();
   const cleanedEntries = {};
   for (const ex of day.exercises) {
     const e = draft.entries[ex.id];
     const validSets = e.sets.filter(s => typeof s.reps === "number" && typeof s.rpe === "number");
-    cleanedEntries[ex.id] = { ...e, sets: validSets };
+    cleanedEntries[ex.id] = {
+      suggestedWeight: e.suggestedWeight,
+      actualWeight: e.actualWeight,
+      sets: validSets,
+      note: (e.note || "").trim(),
+    };
   }
+  const endedAt = new Date().toISOString();
+  const durationSec = Math.floor((new Date(endedAt) - new Date(draft.startedAt || draft.date)) / 1000);
   const session = {
     id: draft.id,
     dayIndex: draft.dayIndex,
-    date: new Date().toISOString(),
+    date: endedAt,
+    startedAt: draft.startedAt || draft.date,
+    durationSec,
     entries: cleanedEntries
   };
   const updates = applyProgression(session);
@@ -1171,44 +1780,53 @@ function finishSession() {
 }
 
 //============================================================
-// Next session preview
+// Preview
 //============================================================
 
 function renderPreview(root) {
   const { session, updates } = view;
   const day = PROGRAM.days[session.dayIndex];
 
-  const topbar = el("div", { class: "topbar" },
+  root.appendChild(el("div", { class: "topbar" },
     el("div", {},
       el("h1", {}, "Next " + day.name),
       el("div", { class: "sub" }, "Suggested weights for your next session")
     )
-  );
-  root.appendChild(topbar);
+  ));
 
-  // Summary
   const totalSetsLogged = Object.values(session.entries).reduce((a, e) => a + e.sets.length, 0);
   const avgRpe = (() => {
     const rpes = [].concat(...Object.values(session.entries).map(e => e.sets.map(s => s.rpe)));
     if (rpes.length === 0) return null;
     return (rpes.reduce((a,b)=>a+b,0) / rpes.length).toFixed(1);
   })();
+  const mins = Math.floor(session.durationSec / 60);
   root.appendChild(
     el("div", { class: "preview-card" },
       el("div", { class: "preview-name" }, "Session summary"),
       el("div", { class: "preview-reason" },
-        `${totalSetsLogged} sets logged` + (avgRpe ? ` · avg RPE ${avgRpe}` : "")
+        `${totalSetsLogged} sets · ${mins} min` + (avgRpe ? ` · avg RPE ${avgRpe}` : "")
       )
     )
   );
+
+  const prCount = updates.filter(u => u.isPR).length;
+  if (prCount > 0) {
+    root.appendChild(el("div", { class: "hint", style: { color: "var(--pr)", marginTop: "-2px" } },
+      `🎯 ${prCount} new personal record${prCount>1?"s":""} — the increase${prCount>1?"s":""} below take${prCount>1?"":"s"} you past your previous max.`
+    ));
+  }
 
   for (const u of updates) {
     const change = u.after - u.before;
     const changeClass = change > 0 ? "change-up" : change < 0 ? "change-down" : "change-same";
     const arrow = change > 0 ? "↑" : change < 0 ? "↓" : "→";
     root.appendChild(
-      el("div", { class: "preview-card" },
-        el("div", { class: "preview-name" }, u.name),
+      el("div", { class: "preview-card" + (u.isPR ? " pr" : "") },
+        el("div", { class: "preview-name" },
+          u.name,
+          u.isPR ? el("span", { class: "pr-badge" }, "🎯 NEW PR") : null
+        ),
         el("div", { class: "preview-change" },
           el("span", {}, `${u.before} lb`),
           el("span", { class: "arrow" }, "→"),
@@ -1222,7 +1840,7 @@ function renderPreview(root) {
   root.appendChild(
     el("div", { class: "action-bar" },
       el("div", { class: "inner" },
-        el("button", { class: "btn btn-primary btn-lg btn-block", onclick: () => { view = { name: "home" }; render(); toast("Session saved. Weights updated."); } }, "Done")
+        el("button", { class: "btn btn-primary btn-lg btn-block", onclick: () => { haptic(10); view = { name: "home" }; render(); } }, "Done")
       )
     )
   );
@@ -1233,8 +1851,8 @@ function renderPreview(root) {
 //============================================================
 
 function renderHistory(root) {
-  const topbar = el("div", { class: "topbar" },
-    el("button", { class: "icon-btn", onclick: () => { view = { name: "home" }; render(); }, "aria-label": "Back" },
+  root.appendChild(el("div", { class: "topbar" },
+    el("button", { class: "icon-btn", onclick: () => { haptic(6); view = { name: "home" }; render(); }, "aria-label": "Back" },
       el("span", { html: backIcon() })
     ),
     el("div", { style: { flex: "1", textAlign: "center" } },
@@ -1242,8 +1860,7 @@ function renderHistory(root) {
       el("div", { class: "sub" }, `${state.sessions.length} sessions logged`)
     ),
     el("div", { style: { width: "44px" } })
-  );
-  root.appendChild(topbar);
+  ));
 
   if (state.sessions.length === 0) {
     root.appendChild(el("div", { class: "empty" },
@@ -1253,31 +1870,66 @@ function renderHistory(root) {
     ));
     return;
   }
-  // Newest first
+
   const sorted = [...state.sessions].sort((a,b) => new Date(b.date) - new Date(a.date));
   for (const s of sorted) {
     const day = PROGRAM.days[s.dayIndex];
     const rpes = [].concat(...Object.values(s.entries).map(e => e.sets.map(x=>x.rpe)));
     const avgRpe = rpes.length ? (rpes.reduce((a,b)=>a+b,0) / rpes.length).toFixed(1) : "—";
-    const exLines = day.exercises.map(ex => {
-      const e = s.entries[ex.id];
-      if (!e || !e.sets.length) return null;
-      const totalReps = e.sets.reduce((a,x)=>a+x.reps,0);
-      return el("div", { class: "hist-ex" },
-        el("strong", {}, EXERCISES[ex.id].name),
-        ` · ${e.actualWeight} lb · ${e.sets.length} sets · ${totalReps} reps`
-      );
-    }).filter(Boolean);
+    const totalSets = Object.values(s.entries).reduce((a,e)=>a+e.sets.length,0);
+    const durMin = s.durationSec ? Math.floor(s.durationSec / 60) : null;
     root.appendChild(
-      el("div", { class: "hist-item" },
+      el("button", { class: "hist-item", onclick: () => { haptic(6); view = { name: "historyDetail", sessionId: s.id }; render(); } },
         el("div", { class: "hist-head" },
           el("strong", {}, day.name),
           el("span", { class: "hist-date" }, new Date(s.date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }))
         ),
-        el("div", { class: "hist-date", style: { marginTop: "2px" } }, `avg RPE ${avgRpe}`),
-        ...exLines
+        el("div", { class: "hist-meta" },
+          el("span", {}, `${totalSets} sets`),
+          durMin != null ? el("span", {}, `${durMin} min`) : null,
+          el("span", {}, `avg RPE ${avgRpe}`)
+        )
       )
     );
+  }
+}
+
+function renderHistoryDetail(root) {
+  const session = state.sessions.find(s => s.id === view.sessionId);
+  if (!session) { view = { name: "history" }; render(); return; }
+  const day = PROGRAM.days[session.dayIndex];
+
+  root.appendChild(el("div", { class: "topbar" },
+    el("button", { class: "icon-btn", onclick: () => { haptic(6); view = { name: "history" }; render(); }, "aria-label": "Back" },
+      el("span", { html: backIcon() })
+    ),
+    el("div", { style: { flex: "1", textAlign: "center" } },
+      el("h1", {}, day.name),
+      el("div", { class: "sub" }, new Date(session.date).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric", year: "numeric" }))
+    ),
+    el("div", { style: { width: "44px" } })
+  ));
+
+  const totalSets = Object.values(session.entries).reduce((a,e)=>a+e.sets.length,0);
+  const durMin = session.durationSec ? Math.floor(session.durationSec / 60) : null;
+  root.appendChild(el("div", { class: "hint", style: { textAlign: "center", margin: "0 0 16px" } },
+    `${totalSets} sets` + (durMin != null ? ` · ${durMin} min` : "")
+  ));
+
+  for (const ex of day.exercises) {
+    const entry = session.entries[ex.id];
+    if (!entry || !entry.sets.length) continue;
+    const card = el("div", { class: "exercise-card" });
+    card.appendChild(el("button", { class: "ex-name-btn", onclick: () => openExerciseModal(ex.id) },
+      EXERCISES[ex.id].name,
+      el("span", { class: "info-icon" }, "i")
+    ));
+    card.appendChild(el("div", { class: "ex-target" }, `${entry.actualWeight} lb`));
+    // Sets table
+    const setsText = entry.sets.map((s, i) => `Set ${i+1}: ${s.reps} reps @ RPE ${s.rpe}`).join(" · ");
+    card.appendChild(el("div", { class: "hist-ex" }, setsText));
+    if (entry.note) card.appendChild(el("div", { class: "hist-note" }, `"${entry.note}"`));
+    root.appendChild(card);
   }
 }
 
@@ -1286,20 +1938,17 @@ function renderHistory(root) {
 //============================================================
 
 function renderSettings(root) {
-  const topbar = el("div", { class: "topbar" },
-    el("button", { class: "icon-btn", onclick: () => { view = { name: "home" }; render(); }, "aria-label": "Back" },
+  root.appendChild(el("div", { class: "topbar" },
+    el("button", { class: "icon-btn", onclick: () => { haptic(6); view = { name: "home" }; render(); }, "aria-label": "Back" },
       el("span", { html: backIcon() })
     ),
     el("div", { style: { flex: "1", textAlign: "center" } }, el("h1", {}, "Settings")),
     el("div", { style: { width: "44px" } })
-  );
-  root.appendChild(topbar);
+  ));
 
-  // Pantry section
-  root.appendChild(el("h3", { style: { fontSize: "14px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "16px", marginBottom: "8px" } }, "Cross-device sync"));
-
+  // Pantry
+  root.appendChild(sectionHeader("Cross-device sync"));
   const pantrySec = el("div", { class: "exercise-card" });
-
   pantrySec.appendChild(el("div", { class: "setting-row" },
     el("div", {},
       el("div", { class: "label" }, "Pantry ID"),
@@ -1319,19 +1968,46 @@ function renderSettings(root) {
     }
   });
   pantrySec.appendChild(input);
-
   pantrySec.appendChild(el("div", { style: { display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" } },
     el("a", { class: "btn btn-ghost", href: "https://getpantry.cloud/", target: "_blank", rel: "noopener" }, "Get a Pantry ID →"),
-    el("button", { class: "btn", onclick: () => { pullFromPantry({ rerender: true }); toast("Pulling from cloud…"); } }, "Pull now"),
-    el("button", { class: "btn", onclick: () => { pushToPantry(); toast("Pushing to cloud…"); } }, "Push now")
+    el("button", { class: "btn", onclick: () => { haptic(8); pullFromPantry({ rerender: true }); } }, "Pull now"),
+    el("button", { class: "btn", onclick: () => { haptic(8); pushToPantry(); } }, "Push now")
   ));
   pantrySec.appendChild(el("div", { class: "hint" },
     "Your pantry ID is the secret. Anyone with it can read/write your data. Workout logs aren't sensitive, so this is fine — but don't paste it publicly."
   ));
   root.appendChild(pantrySec);
 
-  // Backup section
-  root.appendChild(el("h3", { style: { fontSize: "14px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "20px", marginBottom: "8px" } }, "Backup"));
+  // Workout UX settings
+  root.appendChild(sectionHeader("Workout experience"));
+  const uxSec = el("div", { class: "exercise-card" });
+  uxSec.appendChild(settingToggle("Rest timer", "Auto-starts after each completed set.", "restEnabled"));
+  uxSec.appendChild(
+    el("div", { class: "setting-row" },
+      el("div", {},
+        el("div", { class: "label" }, "Compound rest"),
+        el("div", { class: "desc" }, "Seconds of rest after compound sets (squat, bench, row, etc.)")
+      ),
+      numberField("restCompoundSec", 30, 300, 15)
+    )
+  );
+  uxSec.appendChild(
+    el("div", { class: "setting-row" },
+      el("div", {},
+        el("div", { class: "label" }, "Isolation rest"),
+        el("div", { class: "desc" }, "Seconds of rest after isolation sets (curls, raises, extensions, etc.)")
+      ),
+      numberField("restIsolationSec", 20, 180, 10)
+    )
+  );
+  uxSec.appendChild(settingToggle("Haptic feedback", "Quick vibration on button taps (Android / supported devices).", "hapticsEnabled"));
+  uxSec.appendChild(settingToggle("Sound cues", "Beep when rest timer ends.", "soundEnabled"));
+  uxSec.appendChild(settingToggle("Warmup reminder", "Shows a reminder on the first compound exercise of each session.", "warmupReminders"));
+  uxSec.appendChild(settingToggle("Auto-collapse completed", "Fully-completed exercises collapse to save screen space. Tap 'Edit' to reopen.", "autoCollapse"));
+  root.appendChild(uxSec);
+
+  // Backup
+  root.appendChild(sectionHeader("Backup"));
   const backup = el("div", { class: "exercise-card" },
     el("div", { class: "hint", style: { marginTop: 0 } }, "Export downloads all your data as JSON. Import replaces your current data."),
     el("div", { style: { display: "flex", gap: "8px", flexWrap: "wrap" } },
@@ -1343,7 +2019,7 @@ function renderSettings(root) {
   root.appendChild(backup);
 
   // Current weights
-  root.appendChild(el("h3", { style: { fontSize: "14px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "20px", marginBottom: "8px" } }, "Current suggested weights"));
+  root.appendChild(sectionHeader("Current suggested weights"));
   const weightsSec = el("div", { class: "exercise-card" });
   const sortedExs = Object.keys(EXERCISES).sort((a,b) => state.weights[a] - state.weights[b] || EXERCISES[a].name.localeCompare(EXERCISES[b].name));
   for (const id of sortedExs) {
@@ -1362,8 +2038,7 @@ function renderSettings(root) {
   }
   root.appendChild(weightsSec);
 
-  // About
-  root.appendChild(el("h3", { style: { fontSize: "14px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "20px", marginBottom: "8px" } }, "About"));
+  root.appendChild(sectionHeader("About"));
   root.appendChild(el("div", { class: "hint" },
     "Progression rules: ", el("br"),
     "• Avg RPE ≤ 7.4 + all reps hit → increase 5 lb", el("br"),
@@ -1371,14 +2046,54 @@ function renderSettings(root) {
     "• Missed reps → hold", el("br"),
     "• Avg RPE ≥ 9.5 → drop 5 lb", el("br"),
     el("br"),
-    "Dumbbells available: ", DUMBBELLS.join(", "), " lb. ",
+    "Dumbbells available: ", DUMBBELLS.join(", "), " lb.",
     el("br"), el("br"),
     "Based on ", el("a", { href: "https://www.muscleandstrength.com/workouts/3-day-full-body-dumbbell-workout", target: "_blank", rel: "noopener" }, "3-Day Full Body Dumbbell Workout"), " by Josh England."
   ));
 }
 
+function sectionHeader(text) {
+  return el("h3", { style: { fontSize: "14px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "16px", marginBottom: "8px" } }, text);
+}
+
+function settingToggle(label, desc, key) {
+  const row = el("div", { class: "setting-row" });
+  row.appendChild(el("div", {},
+    el("div", { class: "label" }, label),
+    desc ? el("div", { class: "desc" }, desc) : null
+  ));
+  const sw = el("button", {
+    class: "switch" + (state.settings[key] ? " on" : ""),
+    onclick: () => {
+      haptic(6);
+      state.settings[key] = !state.settings[key];
+      saveState();
+      render();
+    },
+    "aria-label": label
+  });
+  row.appendChild(sw);
+  return row;
+}
+
+function numberField(key, min, max, step) {
+  return el("input", {
+    type: "number",
+    class: "number-input",
+    value: String(state.settings[key]),
+    min: String(min), max: String(max), step: String(step),
+    onchange: (e) => {
+      let v = Number(e.target.value);
+      if (!isFinite(v)) v = state.settings[key];
+      v = Math.max(min, Math.min(max, v));
+      state.settings[key] = v;
+      saveState();
+    }
+  });
+}
+
 //============================================================
-// Onboarding (optional — first launch when no data)
+// Onboarding
 //============================================================
 
 function renderOnboarding(root) {
@@ -1388,13 +2103,13 @@ function renderOnboarding(root) {
     "Before you start, you can optionally connect a Pantry ID now so your data syncs across devices — or skip it and just use this one device."
   ));
   root.appendChild(el("div", { style: { display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" } },
-    el("button", { class: "btn btn-primary btn-lg", onclick: () => { view = { name: "settings" }; render(); } }, "Connect Pantry ID"),
-    el("button", { class: "btn btn-lg", onclick: () => { view = { name: "home" }; render(); } }, "Skip for now")
+    el("button", { class: "btn btn-primary btn-lg", onclick: () => { haptic(8); view = { name: "settings" }; render(); } }, "Connect Pantry ID"),
+    el("button", { class: "btn btn-lg", onclick: () => { haptic(8); view = { name: "home" }; render(); } }, "Skip for now")
   ));
 }
 
 //============================================================
-// Exercise demo modal
+// Exercise modal (form cue + progress chart + demo links)
 //============================================================
 
 function openExerciseModal(id) {
@@ -1402,6 +2117,14 @@ function openExerciseModal(id) {
   const query = encodeURIComponent(ex.name + " form tutorial");
   const ytSearch = `https://www.youtube.com/results?search_query=${query}`;
   const msPage = `https://www.muscleandstrength.com/exercises/${ex.slug}.html`;
+
+  // Build sparkline data: chronological weights for this exercise
+  const series = [];
+  for (const s of state.sessions) {
+    const e = s.entries[id];
+    if (!e || !e.sets.length) continue;
+    series.push({ date: s.date, value: e.actualWeight });
+  }
 
   const root = document.getElementById("modal-root");
   root.innerHTML = "";
@@ -1411,16 +2134,95 @@ function openExerciseModal(id) {
     el("button", { class: "modal-close", onclick: closeModal, "aria-label": "Close" }, "✕"),
     el("h3", {}, ex.name),
     el("div", { class: "form-cue" }, ex.cue),
-    el("div", { style: { display: "flex", flexDirection: "column", gap: "10px" } },
-      el("a", { class: "btn btn-primary btn-block", href: ytSearch, target: "_blank", rel: "noopener" }, "Watch on YouTube →"),
-      el("a", { class: "btn btn-block", href: msPage, target: "_blank", rel: "noopener" }, "Open on Muscle & Strength →")
-    )
+    buildSparklineCard(series, state.weights[id])
   );
+  const btns = el("div", { style: { display: "flex", flexDirection: "column", gap: "10px" } },
+    el("a", { class: "btn btn-primary btn-block", href: ytSearch, target: "_blank", rel: "noopener" }, "Watch on YouTube →"),
+    el("a", { class: "btn btn-block", href: msPage, target: "_blank", rel: "noopener" }, "Open on Muscle & Strength →")
+  );
+  modal.appendChild(btns);
   backdrop.appendChild(modal);
   root.appendChild(backdrop);
+  haptic(6);
 }
 function closeModal() {
   document.getElementById("modal-root").innerHTML = "";
+}
+
+function buildSparklineCard(series, currentWeight) {
+  const wrap = el("div", { class: "spark-wrap" });
+  wrap.appendChild(el("div", { class: "spark-head" },
+    el("strong", {}, "Progress"),
+    el("span", {}, series.length > 0 ? `${series.length} session${series.length>1?"s":""} · now ${currentWeight} lb` : `Starting ${currentWeight} lb`)
+  ));
+  if (series.length === 0) {
+    wrap.appendChild(el("div", { class: "spark-empty" }, "Log a session to start tracking."));
+  } else if (series.length === 1) {
+    wrap.appendChild(el("div", { class: "spark-empty" }, `Single session at ${series[0].value} lb — one more to see the trend.`));
+  } else {
+    wrap.appendChild(sparklineSVG(series));
+  }
+  return wrap;
+}
+
+function sparklineSVG(series) {
+  const width = 320;
+  const height = 80;
+  const pad = 8;
+  const values = series.map(s => s.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const n = series.length;
+  const step = (width - 2*pad) / (n - 1);
+  const points = series.map((d, i) => {
+    const x = pad + i * step;
+    const y = height - pad - ((d.value - min) / range) * (height - 2*pad);
+    return { x, y, value: d.value };
+  });
+  const pathD = "M " + points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" L ");
+  const areaD = pathD + ` L ${points[points.length-1].x.toFixed(1)},${height-pad} L ${pad},${height-pad} Z`;
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.style.width = "100%";
+  svg.style.height = height + "px";
+  svg.style.display = "block";
+  // Area fill
+  const area = document.createElementNS(svgNS, "path");
+  area.setAttribute("d", areaD);
+  area.setAttribute("fill", "rgba(90, 155, 255, 0.15)");
+  svg.appendChild(area);
+  // Line
+  const line = document.createElementNS(svgNS, "path");
+  line.setAttribute("d", pathD);
+  line.setAttribute("fill", "none");
+  line.setAttribute("stroke", "var(--accent)");
+  line.setAttribute("stroke-width", "2");
+  line.setAttribute("stroke-linecap", "round");
+  line.setAttribute("stroke-linejoin", "round");
+  svg.appendChild(line);
+  // Points
+  for (const p of points) {
+    const c = document.createElementNS(svgNS, "circle");
+    c.setAttribute("cx", p.x);
+    c.setAttribute("cy", p.y);
+    c.setAttribute("r", "2.5");
+    c.setAttribute("fill", "var(--accent)");
+    svg.appendChild(c);
+  }
+  // Last point highlight
+  const last = points[points.length-1];
+  const lastC = document.createElementNS(svgNS, "circle");
+  lastC.setAttribute("cx", last.x);
+  lastC.setAttribute("cy", last.y);
+  lastC.setAttribute("r", "4");
+  lastC.setAttribute("fill", "var(--accent)");
+  lastC.setAttribute("stroke", "var(--bg-raised)");
+  lastC.setAttribute("stroke-width", "2");
+  svg.appendChild(lastC);
+  return svg;
 }
 
 //============================================================
@@ -1428,6 +2230,7 @@ function closeModal() {
 //============================================================
 
 function exportData() {
+  haptic(8);
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -1438,9 +2241,9 @@ function exportData() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  toast("Exported");
 }
 function triggerImport() {
+  haptic(8);
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "application/json,.json";
@@ -1455,8 +2258,7 @@ function triggerImport() {
         if (!confirm("Replace current data with imported data?")) return;
         state = { ...defaultState(), ...imported };
         saveState();
-        toast("Imported — reloading…");
-        setTimeout(() => { view = { name: "home" }; render(); }, 400);
+        setTimeout(() => { view = { name: "home" }; render(); }, 200);
       } catch (e) {
         alert("Failed to import: " + e.message);
       }
@@ -1468,28 +2270,16 @@ function triggerImport() {
 function resetAll() {
   if (!confirm("Erase ALL local data? This can't be undone (unless you also push to Pantry).")) return;
   if (!confirm("Really erase everything?")) return;
+  haptic(30);
   localStorage.removeItem(STORAGE_KEY);
   state = defaultState();
   saveState();
-  toast("Reset complete");
   view = { name: "home" };
   render();
 }
 
 //============================================================
-// Toast
-//============================================================
-
-function toast(msg, ms = 1800) {
-  const root = document.getElementById("toast-root");
-  root.innerHTML = "";
-  const t = el("div", { class: "toast" }, msg);
-  root.appendChild(t);
-  setTimeout(() => { if (root.firstChild === t) root.innerHTML = ""; }, ms);
-}
-
-//============================================================
-// Icons (inline SVG)
+// Icons
 //============================================================
 
 function backIcon() { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>'; }
@@ -1501,18 +2291,34 @@ function listIcon() { return '<svg width="20" height="20" viewBox="0 0 24 24" fi
 // Boot
 //============================================================
 
+// Update the session elapsed counter every minute when in session
+let sessionTickInterval = null;
+function startSessionTicker() {
+  stopSessionTicker();
+  sessionTickInterval = setInterval(() => {
+    if (view.name === "session" && state.draft) {
+      // Only rerender the topbar subtitle — cheap path: just rerender all
+      // We avoid full render cost by only rerendering every 60s
+      render();
+    }
+  }, 60000);
+}
+function stopSessionTicker() {
+  if (sessionTickInterval) clearInterval(sessionTickInterval);
+  sessionTickInterval = null;
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-  // First launch?
   const isFirstLaunch = state.sessions.length === 0 && !state.settings.pantryId && !localStorage.getItem(STORAGE_KEY + ".welcomed");
   if (isFirstLaunch) {
     localStorage.setItem(STORAGE_KEY + ".welcomed", "1");
     view = { name: "onboarding" };
   }
   render();
+  startSessionTicker();
   if (state.settings.pantryId) pullFromPantry({ rerender: true });
 });
 
-// Save on unload as a safety net
 window.addEventListener("beforeunload", () => {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
 });
