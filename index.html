@@ -203,7 +203,19 @@ textarea { resize: vertical; min-height: 64px; width: 100%; }
   border-radius: var(--radius);
   padding: 14px;
   margin-bottom: 12px;
-  transition: border-color .15s;
+  transition: border-color .15s, box-shadow .3s;
+}
+/* FLIP reshuffle: brief glow on the card that was just bumped to a new group */
+.exercise-card.just-moved {
+  animation: justMoved 900ms ease-out;
+}
+@keyframes justMoved {
+  0%   { box-shadow: 0 0 0 0 rgba(90,155,255,.0),    0 0 0 0 rgba(90,155,255,.0); border-color: var(--accent); }
+  30%  { box-shadow: 0 0 0 3px rgba(90,155,255,.28), 0 6px 22px rgba(90,155,255,.35); border-color: var(--accent); }
+  100% { box-shadow: 0 0 0 0 rgba(90,155,255,.0),    0 0 0 0 rgba(90,155,255,.0); border-color: var(--border); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exercise-card.just-moved { animation: none; }
 }
 .exercise-card.done {
   border-color: rgba(74,222,128,.35);
@@ -1184,9 +1196,90 @@ function applyProgression(session) {
 
 let view = { name: "home" };
 const app = () => document.getElementById("app");
+let lastViewName = null;
+
+// FLIP reshuffle animation for the session view.
+// When exercises re-sort (e.g. after adjusting a weight), capture each
+// card's position BEFORE the DOM update, then after the update measure
+// again, apply an inverse transform, and let CSS transition it back to 0.
+function captureFlipRects(root) {
+  const rects = new Map();
+  const sy = window.scrollY || 0;
+  const sx = window.scrollX || 0;
+  root.querySelectorAll("[data-ex-id]").forEach(el => {
+    const r = el.getBoundingClientRect();
+    rects.set(el.dataset.exId, {
+      top: r.top + sy,
+      left: r.left + sx,
+      width: r.width,
+    });
+  });
+  return rects;
+}
+
+function runFlip(root, firstRects, bumpedExId) {
+  if (!firstRects || firstRects.size === 0) return;
+  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) { if (bumpedExId) highlightCard(root, bumpedExId); return; }
+  const sy = window.scrollY || 0;
+  const sx = window.scrollX || 0;
+  const movers = [];
+  root.querySelectorAll("[data-ex-id]").forEach(el => {
+    const first = firstRects.get(el.dataset.exId);
+    if (!first) return;
+    const r = el.getBoundingClientRect();
+    const lastTop = r.top + sy;
+    const lastLeft = r.left + sx;
+    const dx = first.left - lastLeft;
+    const dy = first.top - lastTop;
+    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return;
+    el.style.transition = "none";
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
+    el.style.willChange = "transform";
+    movers.push(el);
+  });
+  if (movers.length === 0) {
+    // Still highlight the bumped card even if it didn't physically move
+    if (bumpedExId) highlightCard(root, bumpedExId);
+    return;
+  }
+  // Force reflow so the inverse transform commits before we animate it off
+  void root.offsetHeight;
+  requestAnimationFrame(() => {
+    movers.forEach(el => {
+      el.style.transition = "transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1)";
+      el.style.transform = "";
+    });
+    setTimeout(() => {
+      movers.forEach(el => {
+        el.style.transition = "";
+        el.style.willChange = "";
+      });
+    }, 360);
+  });
+  if (bumpedExId) highlightCard(root, bumpedExId);
+}
+
+function highlightCard(root, exId) {
+  const card = root.querySelector(`[data-ex-id="${CSS.escape(exId)}"]`);
+  if (!card) return;
+  card.classList.remove("just-moved");
+  // restart animation
+  void card.offsetWidth;
+  card.classList.add("just-moved");
+  setTimeout(() => card.classList.remove("just-moved"), 900);
+}
+
+let pendingBumpExId = null;
 
 function render() {
   const root = app();
+  const viewChanged = lastViewName !== view.name;
+  const flipEnabled = !viewChanged && view.name === "session";
+  const firstRects = flipEnabled ? captureFlipRects(root) : null;
+  const bumpedExId = pendingBumpExId;
+  pendingBumpExId = null;
+
   root.innerHTML = "";
   switch (view.name) {
     case "home": renderHome(root); break;
@@ -1198,7 +1291,10 @@ function render() {
     case "onboarding": renderOnboarding(root); break;
     default: renderHome(root);
   }
-  window.scrollTo({ top: 0, behavior: "instant" });
+  if (viewChanged) window.scrollTo({ top: 0, behavior: "instant" });
+  if (flipEnabled) runFlip(root, firstRects, bumpedExId);
+
+  lastViewName = view.name;
   // Acquire/release wake lock based on view
   if (view.name === "session") acquireWakeLock();
   else releaseWakeLock();
@@ -1488,9 +1584,11 @@ function renderExerciseCard(exDef, draft) {
   const entry = draft.entries[exDef.id];
   const complete = isExerciseComplete(exDef, entry);
   const shouldCollapse = complete && state.settings.autoCollapse && !entry.manuallyExpanded;
+  // Marker used by the FLIP reshuffle animation (see animateReflow)
+  const flipAttr = { "data-ex-id": exDef.id };
 
   if (shouldCollapse) {
-    const card = el("div", { class: "exercise-card done collapsed" });
+    const card = el("div", { class: "exercise-card done collapsed", ...flipAttr });
     card.appendChild(el("div", { class: "collapsed-body" },
       el("div", {},
         el("button", { class: "ex-name-btn", onclick: () => openExerciseModal(exDef.id) },
@@ -1507,7 +1605,7 @@ function renderExerciseCard(exDef, draft) {
     return card;
   }
 
-  const card = el("div", { class: "exercise-card" + (complete ? " done" : "") });
+  const card = el("div", { class: "exercise-card" + (complete ? " done" : ""), ...flipAttr });
 
   const head = el("div", { class: "ex-head" },
     el("div", {},
@@ -1717,7 +1815,8 @@ function adjustWeight(exId, delta) {
   entry.actualWeight = next;
   haptic(6);
   saveState();
-  captureUndo(`Weight ${prev} → ${next} lb`, () => { entry.actualWeight = prev; saveState(); render(); });
+  captureUndo(`Weight ${prev} → ${next} lb`, () => { entry.actualWeight = prev; pendingBumpExId = exId; saveState(); render(); });
+  pendingBumpExId = exId;
   render();
 }
 
